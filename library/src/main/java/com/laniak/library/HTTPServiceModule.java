@@ -3,8 +3,8 @@ package com.laniak.library;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -21,16 +21,24 @@ public class HTTPServiceModule implements IHTTPService
         WebClient client = WebClient.builder()
                 .defaultHeaders(httpHeaders -> headerMap.forEach((x,y)-> httpHeaders.add(x.toString() , y.toString())))
                 .build();
+        System.out.println("INSIDE TAR : " + client.toString());
         return  client;
     }
 
-    public WebClient.ResponseSpec getData( String forwardPath  , WebClient client)
+    public Mono<String> getData(String forwardPath  , WebClient client)
     {
-        return client
+        Mono<String> data =  client
                 .get()
                 .uri(forwardPath)
                 .accept(MediaType.APPLICATION_JSON)
-                .retrieve();
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnSuccess(d -> {
+                    System.out.println("SUCCESS : " + d.toString());
+                })
+                .doOnError(e -> System.out.println("ERROR"));
+
+        return data;
     }
 
 }

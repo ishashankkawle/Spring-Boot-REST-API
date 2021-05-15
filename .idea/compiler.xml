@@ -14,13 +14,13 @@
     <bytecodeTargetLevel>
       <module name="API" target="1.8" />
       <module name="library" target="1.8" />
-      <module name="SpringBoot_Rest_API" target="1.6" />
+      <module name="SpringBoot_Rest_API" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="API" options="-parameters" />
-      <module name="SpringBoot_Rest_API" options="-parameters" />
+      <module name="SpringBoot_Rest_API" options="" />
       <module name="library" options="-parameters" />
     </option>
   </component>

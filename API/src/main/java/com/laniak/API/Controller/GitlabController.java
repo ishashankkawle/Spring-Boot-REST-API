@@ -1,6 +1,7 @@
 package com.laniak.API.Controller;
 
 import com.laniak.API.Configurations.GitlabConfiguration;
+import com.laniak.API.Model.FileData;
 import com.laniak.API.Model.ItemData;
 import com.laniak.library.HTTPServiceModule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 
 @SpringBootApplication(scanBasePackages = "com.laniak.library")
 @RestController
@@ -59,24 +58,21 @@ public class GitlabController
 
 
     @GetMapping("/folder/{folderId}/file/{fileId}")
-    public ItemData[] getFileData(@PathVariable(value = "folderId") String folderId , @PathVariable(value = "fileId") String fileId)
+    public FileData getFileData(@PathVariable(value = "folderId") String folderId , @PathVariable(value = "fileId") String fileId)
     {
-        ItemData[] data;
-        String queryString =  folderId + "/" + fileId;
-        String path = null;
-        try
-        {
-            path = config.getBaseUrl() + "/files/" + URLEncoder.encode(queryString, StandardCharsets.UTF_8.toString()) + "?ref=master";
-        }
-        catch (UnsupportedEncodingException e)
-        {
+        FileData data;
+        URI uri = null;
+        String queryString =  folderId + "%2F" + fileId.replace("." , "%2E");
+        String path = config.getBaseUrl() + "/files/" + queryString + "?ref=master";
+
+        try {
+            uri = new URI(path);
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Path = " + path);
         WebClient client = httpServiceModule.getWebClient(config.getBaseUrl());
-        WebClient.ResponseSpec response = httpServiceModule.getData( path , client);
-        data = response.bodyToMono(ItemData[].class).block();
+        WebClient.ResponseSpec response = httpServiceModule.getData( uri , client);
+        data = response.bodyToMono(FileData.class).block();
         return data;
     }
 
